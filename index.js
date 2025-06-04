@@ -139,14 +139,22 @@ app.post('/customers', verifyAuth, async (req, res) => {
 
 
 // Multer config
-const upload = multer({ dest: "uploads/" });
+const csv = require("csv-parser");
+const stream = require("stream");
+
+const storage = multer.memoryStorage();
+const upload = multer({ storage });
 
 router.post("/upload-csv", upload.single("file"), async (req, res) => {
-  const filePath = req.file.path;
   const customers = [];
-  const addedBy = req.body.addedBy; // 👈 Get the addedBy from frontend form field
+  const addedBy = req.body.addedBy;
 
-  fs.createReadStream(filePath)
+  const readable = new stream.Readable();
+  readable._read = () => {};
+  readable.push(req.file.buffer);
+  readable.push(null);
+
+  readable
     .pipe(csv())
     .on("data", (row) => {
       customers.push(row);
@@ -162,7 +170,7 @@ router.post("/upload-csv", upload.single("file"), async (req, res) => {
             continue;
           }
 
-          const exists = await Customer.findOne({ email: data.email, addedBy }); // optional: filter per user
+          const exists = await Customer.findOne({ email: data.email, addedBy });
           if (exists) {
             skipped++;
             continue;
@@ -175,20 +183,19 @@ router.post("/upload-csv", upload.single("file"), async (req, res) => {
             total_spent: data.total_spent || 0,
             last_active: data.last_active ? new Date(data.last_active) : null,
             visits: data.visits || 0,
-            addedBy, // 👈 attach addedBy manually
+            addedBy,
           });
           added++;
         }
 
-        fs.unlinkSync(filePath); // remove temp file
         res.json({ message: "Upload complete", added, skipped });
       } catch (error) {
-        fs.unlinkSync(filePath);
         console.error(error);
         res.status(500).json({ error: "Error processing CSV" });
       }
     });
 });
+
 
 
 function buildMongoQuery(rules, logic) {
