@@ -3,7 +3,7 @@ const express = require('express');
 const cors = require('cors');
 const { OAuth2Client } = require('google-auth-library');
 const axios = require("axios");
-const serverless = require('serverless-http');
+
 const app = express();
 const PORT = 5000;
 
@@ -338,4 +338,6 @@ app.get("/campaigns/:campaignId/logs", async (req, res) => {
 
 app.use('/api', router);
 
-module.exports = serverless(app);
+app.listen(PORT, () => {
+  console.log(`Server is running on http://localhost:${PORT}`);
+});
