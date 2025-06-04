@@ -3,7 +3,8 @@
   "version": "1.0.0",
   "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "node index"
   },
   "keywords": [],
   "author": "",
@@ -17,7 +18,6 @@
     "express": "^5.1.0",
     "google-auth-library": "^9.15.1",
     "mongoose": "^8.15.1",
-    "multer": "^2.0.0",
-    "serverless-http": "^3.0.0"
+    "multer": "^2.0.0"
   }
 }
