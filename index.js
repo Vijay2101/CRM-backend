@@ -139,7 +139,6 @@ app.post('/customers', verifyAuth, async (req, res) => {
 
 
 // Multer config
-const csv = require("csv-parser");
 const stream = require("stream");
 
 const storage = multer.memoryStorage();
